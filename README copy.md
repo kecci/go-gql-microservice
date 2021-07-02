@@ -108,7 +108,7 @@ Here the points you need to know before contributing:
 
 * Unit Test is essential. Whatever you code, you should always test your code and create the testing unit. Nothing is impossible.
 * Clean code is everything. This project is already implemented with linter, but you need to make sure your code is clean.
-* Documentation. Don't forget to documenting your task. You can use anything documentation like a [Confluence](https://jamtangan.atlassian.net/wiki/spaces/EN/overview). Don't think your code is the best documentation. That's a stupid mindset.
+* Documentation. Don't forget to documenting your task. You can use anything documentation like a [Confluence](https://kecci.atlassian.net/wiki/spaces/EN/overview). Don't think your code is the best documentation. That's a stupid mindset.
 * Follow the standard. We do not care about your style code. In this project, you should follow the standard and style what we made.
 * Idea? Yes, we need your idea to improve the quality of this project and cycle development for more efficiently.
 * Finally, let's code as a team, not as an individual.

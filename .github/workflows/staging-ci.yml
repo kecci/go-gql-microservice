@@ -130,8 +130,8 @@ jobs:
           cd $GOPATH/src/$(dirname ${{env.REPO_NAME}})
           git clone -b master https://${{ secrets.ACCESS_TOKEN }}@github.com/kecci/go-gql-microservice
           cd $GOPATH/src/${{env.REPO_NAME}}
-          helm repo add machtwatch https://curator:rotaruc@chart.machtwatch.net
+          helm repo add go-gql-microservice https://curator:rotaruc@chart.go-gql-microservice.net
           helm repo update
           aws eks --region ${{env.AWS_DEFAULT_REGION}} update-kubeconfig --name ${{env.KUBECLUSTER}}
           kubectl config use-context arn:aws:eks:ap-southeast-1:491248485740:cluster/${{env.KUBECLUSTER}}
-          helm upgrade ${{env.APP_NAME}}-${{env.ENVIRONMENT}} machtwatch/app --install --namespace ${{env.KUBENAMESPACE}} --values _infra/helm/${{env.ENVIRONMENT}}.yaml --set meta.env=${{env.ENVIRONMENT}},meta.maintainer=${{env.KUBENAMESPACE}},meta.version=${{env.ENVIRONMENT}}-${GITHUB_ACTION}-${{env.VERSION_GIT_COMMIT}},image.repository=${IMAGE_REGISTRY}/${{env.APP_NAME}},image.tag=${{env.ENVIRONMENT}}-${GITHUB_ACTION}-${{env.VERSION_GIT_COMMIT}}
+          helm upgrade ${{env.APP_NAME}}-${{env.ENVIRONMENT}} go-gql-microservice/app --install --namespace ${{env.KUBENAMESPACE}} --values _infra/helm/${{env.ENVIRONMENT}}.yaml --set meta.env=${{env.ENVIRONMENT}},meta.maintainer=${{env.KUBENAMESPACE}},meta.version=${{env.ENVIRONMENT}}-${GITHUB_ACTION}-${{env.VERSION_GIT_COMMIT}},image.repository=${IMAGE_REGISTRY}/${{env.APP_NAME}},image.tag=${{env.ENVIRONMENT}}-${GITHUB_ACTION}-${{env.VERSION_GIT_COMMIT}}

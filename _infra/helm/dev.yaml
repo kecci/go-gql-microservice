@@ -41,10 +41,10 @@ ingress:
 
   tls:
     - hosts:
-        - dev-go-gql-microservice.machtwatch.net
+        - dev-go-gql-microservice.kecci.net
 
   hosts:
-    - host: dev-go-gql-microservice.machtwatch.net
+    - host: dev-go-gql-microservice.kecci.net
       paths:
         - "/"
 

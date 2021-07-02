@@ -7,8 +7,8 @@ server:
 
 database:
   driver: "postgres"
-  master: "postgres://machtwatch_user:machtwatch123@postgres-kecci:5432/machtwatch-campaign?sslmode=disable"
-  follower: "postgres://machtwatch_user:machtwatch123@postgres-kecci:5432/machtwatch-campaign?sslmode=disable"
+  master: "postgres://postgres:postgres123@postgres-kecci:5432/go-gql-microservice?sslmode=disable"
+  follower: "postgres://postgres:postgres123@postgres-kecci:5432/go-gql-microservice?sslmode=disable"
   max_open_conns: 200
   max_idle_conns: 10
   max_retry: 1
