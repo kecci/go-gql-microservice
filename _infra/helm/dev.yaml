@@ -1,0 +1,56 @@
+configMap:
+  mountPath: /opt/go-gql-microservice/params
+
+server:
+  port: 8000
+  istio:
+    injected: false
+  readiness:
+    path: /
+
+  resources:
+    requests:
+      cpu: 100m
+      memory: 512Mi
+    limits:
+      cpu: 200m
+      memory: 1Gi
+image:
+  pullSecrets: 
+    - name: regcred
+worker:
+  enabled: false
+
+  command:
+    - go-gql-microservice
+  args:
+    - worker
+
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 100m
+      memory: 128Mi
+
+ingress:
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: "10m"
+    nginx.ingress.kubernetes.io/limit-rps: "10"
+
+  tls:
+    - hosts:
+        - dev-go-gql-microservice.machtwatch.net
+
+  hosts:
+    - host: dev-go-gql-microservice.machtwatch.net
+      paths:
+        - "/"
+
+virtualService:
+  enabled: false
+
+autoscaling:
+  minReplicas: 1
+  maxReplicas: 2

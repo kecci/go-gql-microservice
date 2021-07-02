@@ -1,0 +1,27 @@
+mode: set
+github.com/kecci/go-gql-microservice/internal/service/health/service.health.init.go:7.42,11.2 1 1
+github.com/kecci/go-gql-microservice/internal/service/health/service.health.method.go:9.56,11.2 1 1
+github.com/kecci/go-gql-microservice/internal/resolver/health.resolvers.go:13.82,15.2 1 0
+github.com/kecci/go-gql-microservice/internal/resolver/health.resolvers.go:18.52,18.80 1 0
+github.com/kecci/go-gql-microservice/internal/resolver/resolver.go:25.13,29.2 1 1
+github.com/kecci/go-gql-microservice/internal/config/config.go:18.44,21.16 3 1
+github.com/kecci/go-gql-microservice/internal/config/config.go:24.2,27.16 4 1
+github.com/kecci/go-gql-microservice/internal/config/config.go:30.2,30.18 1 0
+github.com/kecci/go-gql-microservice/internal/config/config.go:21.16,23.3 1 1
+github.com/kecci/go-gql-microservice/internal/config/config.go:27.16,29.3 1 1
+github.com/kecci/go-gql-microservice/internal/config/config.go:36.44,40.39 3 1
+github.com/kecci/go-gql-microservice/internal/config/config.go:44.2,45.65 2 1
+github.com/kecci/go-gql-microservice/internal/config/config.go:40.39,42.3 1 0
+github.com/kecci/go-gql-microservice/internal/outbound/http_client/outbound.http_client.init.go:11.50,16.2 2 1
+github.com/kecci/go-gql-microservice/internal/outbound/http_client/outbound.http_client.method.go:12.120,14.16 2 1
+github.com/kecci/go-gql-microservice/internal/outbound/http_client/outbound.http_client.method.go:19.2,21.16 3 1
+github.com/kecci/go-gql-microservice/internal/outbound/http_client/outbound.http_client.method.go:25.2,26.8 2 1
+github.com/kecci/go-gql-microservice/internal/outbound/http_client/outbound.http_client.method.go:14.16,17.3 2 1
+github.com/kecci/go-gql-microservice/internal/outbound/http_client/outbound.http_client.method.go:21.16,24.3 2 0
+github.com/kecci/go-gql-microservice/internal/outbound/http_client/outbound.http_client.method.go:30.123,32.16 2 1
+github.com/kecci/go-gql-microservice/internal/outbound/http_client/outbound.http_client.method.go:35.2,35.8 1 1
+github.com/kecci/go-gql-microservice/internal/outbound/http_client/outbound.http_client.method.go:32.16,34.3 1 0
+github.com/kecci/go-gql-microservice/internal/repo/health/repo.health.init.go:20.37,28.16 4 1
+github.com/kecci/go-gql-microservice/internal/repo/health/repo.health.init.go:32.2,37.8 1 1
+github.com/kecci/go-gql-microservice/internal/repo/health/repo.health.init.go:28.16,30.3 1 1
+github.com/kecci/go-gql-microservice/internal/repo/health/repo.health.method.go:10.72,14.2 1 1

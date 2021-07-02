@@ -1,0 +1,17 @@
+server:
+  gql:
+    address: ":8000"
+
+database:
+  driver: "postgres"
+  master: "postgres://userdevmw:kz!2VHzpHay*TA@mw-dev-core-postgres.cmrlcrs1hacc.ap-southeast-1.rds.amazonaws.com:5432/mwgqlaccount"
+  follower: "postgres://userdevmw:kz!2VHzpHay*TA@mw-dev-core-postgres.cmrlcrs1hacc.ap-southeast-1.rds.amazonaws.com:5432/mwgqlaccount"
+  max_open_conns: 200
+  max_idle_conns: 10
+  max_retry: 1
+  conn_max_lifetime: 300
+
+cache:
+  engine: ""
+  address: "mw-dev-core.3dsy4y.ng.0001.apse1.cache.amazonaws.com:6379"
+  expiry_token: 15

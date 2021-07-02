@@ -1,0 +1,8 @@
+vendor
+tmp
+bin
+
+# docker persistence
+.docker/postgres-data
+.docker/nsq-data
+.docker/seeding

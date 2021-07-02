@@ -1,0 +1,15 @@
+server:
+  gql:
+    address: ":8000"
+    write_timeout: 15
+    read_timeout: 15
+    idle_timeout: 60
+
+database:
+  driver: "postgres"
+  master: "postgres://machtwatch_user:machtwatch123@postgres-kecci:5432/machtwatch-campaign?sslmode=disable"
+  follower: "postgres://machtwatch_user:machtwatch123@postgres-kecci:5432/machtwatch-campaign?sslmode=disable"
+  max_open_conns: 200
+  max_idle_conns: 10
+  max_retry: 1
+  conn_max_lifetime: 300

@@ -1,0 +1,12 @@
+server:
+  gql:
+    address: ":8000"
+
+database:
+  driver: "postgres"
+  master: "postgres://machtwatch_user:machtwatch123@postgres-kecci:5432/machtwatch-campaign?sslmode=disable"
+  follower: "postgres://machtwatch_user:machtwatch123@postgres-kecci:5432/machtwatch-campaign?sslmode=disable"
+  max_open_conns: 200
+  max_idle_conns: 10
+  max_retry: 1
+  conn_max_lifetime: 300

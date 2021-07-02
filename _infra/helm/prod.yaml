@@ -1,0 +1,44 @@
+configMap:
+  mountPath: /opt/go-gql-microservice/params
+
+server:
+  port: 8000
+  istio:
+    injected: false
+  readiness:
+    path: /
+
+  resources:
+    requests:
+      cpu: 1
+      memory: 4Gi
+    limits:
+      cpu: 2
+      memory: 8Gi
+image:
+  pullSecrets: 
+    - name: regcred
+worker:
+  enabled: false
+
+ingress:
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: "10m"
+    nginx.ingress.kubernetes.io/limit-rps: "10"
+
+  tls:
+    - hosts:
+        - go-gql-microservice.jamtangan.com
+
+  hosts:
+    - host: go-gql-microservice.jamtangan.com
+      paths:
+        - "/"
+
+autoscaling:
+  minReplicas: 2
+  maxReplicas: 20
+  cpu:
+    targetAverageUtilization: 70
+  memory:
+    targetAverageUtilization: 80
