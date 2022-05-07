@@ -1,137 +1,137 @@
-name: Go
+# name: Go
 
 
-env:
-  REPO_NAME: github.com/kecci/go-gql-microservice
-  ENVIRONMENT: dev
-  IMAGE_REGISTRY: 491248485740.dkr.ecr.ap-southeast-1.amazonaws.com
-  VERSION_GIT_COMMIT: $GITHUB_SHA
-  APP_NAME: go-gql-microservice
-  AWS_DEFAULT_REGION: ap-southeast-1
-  KUBENAMESPACE: backend
-  KUBECLUSTER: mw-dev
+# env:
+#   REPO_NAME: github.com/kecci/go-gql-microservice
+#   ENVIRONMENT: dev
+#   IMAGE_REGISTRY: 491248485740.dkr.ecr.ap-southeast-1.amazonaws.com
+#   VERSION_GIT_COMMIT: $GITHUB_SHA
+#   APP_NAME: go-gql-microservice
+#   AWS_DEFAULT_REGION: ap-southeast-1
+#   KUBENAMESPACE: backend
+#   KUBECLUSTER: mw-dev
 
-on:
-  pull_request:
-    branches: [ master ]
-  push:
-    branches: [ master ]
-jobs:
+# on:
+#   pull_request:
+#     branches: [ master ]
+#   push:
+#     branches: [ master ]
+# jobs:
 
-  sonarqube_check:
-    if: github.event_name == 'pull_request'
-    name: Sonarqube
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-      - uses: docker://sonarsource/sonar-scanner-cli:latest
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+#   sonarqube_check:
+#     if: github.event_name == 'pull_request'
+#     name: Sonarqube
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@v2
+#         with:
+#           fetch-depth: 0
+#       - uses: docker://sonarsource/sonar-scanner-cli:latest
+#         env:
+#           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+#           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
 
-  compile_stagging:
-    if: github.event_name == 'push'
-    runs-on: ubuntu-latest
-    container: golang:latest
-    steps:
-      - run: |
-          mkdir -p $GOPATH/src/$(dirname ${{env.REPO_NAME}})
-          cd $GOPATH/src/$(dirname ${{env.REPO_NAME}})
-          git clone -b master https://${{ secrets.ACCESS_TOKEN }}@github.com/kecci/go-gql-microservice
-          cd $GOPATH/src/${{env.REPO_NAME}}
-          git rev-parse --abbrev-ref HEAD
-          go env -w GOPRIVATE=github.com/${GITHUB_ACTOR}
-          git config --global url."https://${{ secrets.ACCESS_TOKEN }}@github.com".insteadOf "https://github.com"
-          go get -u github.com/rakyll/gotest
-          go build -race -ldflags "-extldflags '-static'" -o $GITHUB_WORKSPACE/testbinary ./cmd/gql/...
-          ls -al
+#   compile_stagging:
+#     if: github.event_name == 'push'
+#     runs-on: ubuntu-latest
+#     container: golang:latest
+#     steps:
+#       - run: |
+#           mkdir -p $GOPATH/src/$(dirname ${{env.REPO_NAME}})
+#           cd $GOPATH/src/$(dirname ${{env.REPO_NAME}})
+#           git clone -b master https://${{ secrets.ACCESS_TOKEN }}@github.com/kecci/go-gql-microservice
+#           cd $GOPATH/src/${{env.REPO_NAME}}
+#           git rev-parse --abbrev-ref HEAD
+#           go env -w GOPRIVATE=github.com/${GITHUB_ACTOR}
+#           git config --global url."https://${{ secrets.ACCESS_TOKEN }}@github.com".insteadOf "https://github.com"
+#           go get -u github.com/rakyll/gotest
+#           go build -race -ldflags "-extldflags '-static'" -o $GITHUB_WORKSPACE/testbinary ./cmd/gql/...
+#           ls -al
 
-  test_stagging:
-    if: github.event_name == 'push'
-    runs-on: ubuntu-latest
-    container: golang:latest
-    steps:
-      - run: |
-          mkdir -p $GOPATH/src/$(dirname ${{env.REPO_NAME}})
-          cd $GOPATH/src/$(dirname ${{env.REPO_NAME}})
-          git clone -b master https://${{ secrets.ACCESS_TOKEN }}@github.com/kecci/go-gql-microservice
-          cd $GOPATH/src/${{env.REPO_NAME}}
-          git rev-parse --abbrev-ref HEAD
-          go env -w GOPRIVATE=github.com/${GITHUB_ACTOR}
-          git config --global url."https://${{ secrets.ACCESS_TOKEN }}@github.com".insteadOf "https://github.com"
-          go get -u github.com/rakyll/gotest
-          pwd
-          GOSUMDB=off gotest -gcflags="-l" -race ./...
+#   test_stagging:
+#     if: github.event_name == 'push'
+#     runs-on: ubuntu-latest
+#     container: golang:latest
+#     steps:
+#       - run: |
+#           mkdir -p $GOPATH/src/$(dirname ${{env.REPO_NAME}})
+#           cd $GOPATH/src/$(dirname ${{env.REPO_NAME}})
+#           git clone -b master https://${{ secrets.ACCESS_TOKEN }}@github.com/kecci/go-gql-microservice
+#           cd $GOPATH/src/${{env.REPO_NAME}}
+#           git rev-parse --abbrev-ref HEAD
+#           go env -w GOPRIVATE=github.com/${GITHUB_ACTOR}
+#           git config --global url."https://${{ secrets.ACCESS_TOKEN }}@github.com".insteadOf "https://github.com"
+#           go get -u github.com/rakyll/gotest
+#           pwd
+#           GOSUMDB=off gotest -gcflags="-l" -race ./...
 
-  package_stagging:
-    if: github.event_name == 'push'
-    runs-on: ubuntu-latest
-    container: docker:latest
-    needs: [compile_stagging,test_stagging]
-    steps:
-      - name: Configure AWS credentials from Test account
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ap-southeast-1
-      - run: |
-          apk add git
-          mkdir -p $GOPATH/src/$(dirname ${{env.REPO_NAME}})
-          cd $GOPATH/src/$(dirname ${{env.REPO_NAME}})
-          git clone -b master https://${{ secrets.ACCESS_TOKEN }}@github.com/kecci/go-gql-microservice
-          cd $GOPATH/src/${{env.REPO_NAME}}
-          docker info
-          echo "docker build -f production.dockerfile --build-arg ACCESS_TOKEN=${{ secrets.ACCESS_TOKEN }} --build-arg IMG_REG=${{env.IMAGE_REGISTRY}} --build-arg ENVIRONMENT=${{env.ENVIRONMENT}} --build-arg VERSION=${{env.ENVIRONMENT}}-${GITHUB_ACTION}-${{env.VERSION_GIT_COMMIT}} --build-arg GIT_COMMIT=${{env.VERSION_GIT_COMMIT}} -t ${{env.IMAGE_REGISTRY}}/${{env.APP_NAME}}:local ."
-          docker build -f production.dockerfile --build-arg ACCESS_TOKEN=${{ secrets.ACCESS_TOKEN }} --build-arg IMG_REG=${{env.IMAGE_REGISTRY}} --build-arg ENVIRONMENT=${{env.ENVIRONMENT}} --build-arg VERSION=${{env.ENVIRONMENT}}-${GITHUB_ACTION}-${{env.VERSION_GIT_COMMIT}} --build-arg GIT_COMMIT=${{env.VERSION_GIT_COMMIT}} -t ${{env.IMAGE_REGISTRY}}/${{env.APP_NAME}}:local .
-          echo "docker tag ${{env.IMAGE_REGISTRY}}/${{env.APP_NAME}}:local ${{env.IMAGE_REGISTRY}}/${{env.APP_NAME}}:${{env.VERSION_GIT_COMMIT}}"
-          docker tag ${{env.IMAGE_REGISTRY}}/${{env.APP_NAME}}:local ${{env.IMAGE_REGISTRY}}/${{env.APP_NAME}}:${{env.VERSION_GIT_COMMIT}}
-          echo "docker tag ${{env.IMAGE_REGISTRY}}/${{env.APP_NAME}}:local ${{env.IMAGE_REGISTRY}}/${{env.APP_NAME}}:${{env.ENVIRONMENT}}-${GITHUB_ACTION}-${{env.VERSION_GIT_COMMIT}}"
-          docker tag ${{env.IMAGE_REGISTRY}}/${{env.APP_NAME}}:local ${{env.IMAGE_REGISTRY}}/${{env.APP_NAME}}:${{env.ENVIRONMENT}}-${GITHUB_ACTION}-${{env.VERSION_GIT_COMMIT}}
-          echo "docker tag ${{env.IMAGE_REGISTRY}}/${{env.APP_NAME}}:local ${{env.IMAGE_REGISTRY}}/${{env.APP_NAME}}:${{env.ENVIRONMENT}}-latest"
-          docker tag ${{env.IMAGE_REGISTRY}}/${{env.APP_NAME}}:local ${{env.IMAGE_REGISTRY}}/${{env.APP_NAME}}:${{env.ENVIRONMENT}}-latest
-          echo "apk add --no-cache curl jq python3 py3-pip"
-          apk add --no-cache curl jq python3 py3-pip
-          echo "pip install awscli"
-          pip install awscli
-          echo "aws ecr get-login-password | docker login --username AWS --password-stdin ${{env.IMAGE_REGISTRY}}"
-          aws ecr get-login-password | docker login --username AWS --password-stdin ${{env.IMAGE_REGISTRY}}
-          echo "aws --version"
-          aws --version
-          echo "docker info"
-          docker info
-          echo "docker --version"
-          docker --version
-          echo "docker push ${{env.IMAGE_REGISTRY}}/${{env.APP_NAME}}:${{env.VERSION_GIT_COMMIT}}"
-          docker push ${{env.IMAGE_REGISTRY}}/${{env.APP_NAME}}:${{env.VERSION_GIT_COMMIT}}
-          echo "docker push ${{env.IMAGE_REGISTRY}}/${{env.APP_NAME}}:${{env.ENVIRONMENT}}-${GITHUB_ACTION}-${{env.VERSION_GIT_COMMIT}}"
-          docker push ${{env.IMAGE_REGISTRY}}/${{env.APP_NAME}}:${{env.ENVIRONMENT}}-${GITHUB_ACTION}-${{env.VERSION_GIT_COMMIT}}
-          echo "docker push ${{env.IMAGE_REGISTRY}}/${{env.APP_NAME}}:${{env.ENVIRONMENT}}-latest"
-          docker push ${{env.IMAGE_REGISTRY}}/${{env.APP_NAME}}:${{env.ENVIRONMENT}}-latest
+#   package_stagging:
+#     if: github.event_name == 'push'
+#     runs-on: ubuntu-latest
+#     container: docker:latest
+#     needs: [compile_stagging,test_stagging]
+#     steps:
+#       - name: Configure AWS credentials from Test account
+#         uses: aws-actions/configure-aws-credentials@v1
+#         with:
+#           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#           aws-region: ap-southeast-1
+#       - run: |
+#           apk add git
+#           mkdir -p $GOPATH/src/$(dirname ${{env.REPO_NAME}})
+#           cd $GOPATH/src/$(dirname ${{env.REPO_NAME}})
+#           git clone -b master https://${{ secrets.ACCESS_TOKEN }}@github.com/kecci/go-gql-microservice
+#           cd $GOPATH/src/${{env.REPO_NAME}}
+#           docker info
+#           echo "docker build -f production.dockerfile --build-arg ACCESS_TOKEN=${{ secrets.ACCESS_TOKEN }} --build-arg IMG_REG=${{env.IMAGE_REGISTRY}} --build-arg ENVIRONMENT=${{env.ENVIRONMENT}} --build-arg VERSION=${{env.ENVIRONMENT}}-${GITHUB_ACTION}-${{env.VERSION_GIT_COMMIT}} --build-arg GIT_COMMIT=${{env.VERSION_GIT_COMMIT}} -t ${{env.IMAGE_REGISTRY}}/${{env.APP_NAME}}:local ."
+#           docker build -f production.dockerfile --build-arg ACCESS_TOKEN=${{ secrets.ACCESS_TOKEN }} --build-arg IMG_REG=${{env.IMAGE_REGISTRY}} --build-arg ENVIRONMENT=${{env.ENVIRONMENT}} --build-arg VERSION=${{env.ENVIRONMENT}}-${GITHUB_ACTION}-${{env.VERSION_GIT_COMMIT}} --build-arg GIT_COMMIT=${{env.VERSION_GIT_COMMIT}} -t ${{env.IMAGE_REGISTRY}}/${{env.APP_NAME}}:local .
+#           echo "docker tag ${{env.IMAGE_REGISTRY}}/${{env.APP_NAME}}:local ${{env.IMAGE_REGISTRY}}/${{env.APP_NAME}}:${{env.VERSION_GIT_COMMIT}}"
+#           docker tag ${{env.IMAGE_REGISTRY}}/${{env.APP_NAME}}:local ${{env.IMAGE_REGISTRY}}/${{env.APP_NAME}}:${{env.VERSION_GIT_COMMIT}}
+#           echo "docker tag ${{env.IMAGE_REGISTRY}}/${{env.APP_NAME}}:local ${{env.IMAGE_REGISTRY}}/${{env.APP_NAME}}:${{env.ENVIRONMENT}}-${GITHUB_ACTION}-${{env.VERSION_GIT_COMMIT}}"
+#           docker tag ${{env.IMAGE_REGISTRY}}/${{env.APP_NAME}}:local ${{env.IMAGE_REGISTRY}}/${{env.APP_NAME}}:${{env.ENVIRONMENT}}-${GITHUB_ACTION}-${{env.VERSION_GIT_COMMIT}}
+#           echo "docker tag ${{env.IMAGE_REGISTRY}}/${{env.APP_NAME}}:local ${{env.IMAGE_REGISTRY}}/${{env.APP_NAME}}:${{env.ENVIRONMENT}}-latest"
+#           docker tag ${{env.IMAGE_REGISTRY}}/${{env.APP_NAME}}:local ${{env.IMAGE_REGISTRY}}/${{env.APP_NAME}}:${{env.ENVIRONMENT}}-latest
+#           echo "apk add --no-cache curl jq python3 py3-pip"
+#           apk add --no-cache curl jq python3 py3-pip
+#           echo "pip install awscli"
+#           pip install awscli
+#           echo "aws ecr get-login-password | docker login --username AWS --password-stdin ${{env.IMAGE_REGISTRY}}"
+#           aws ecr get-login-password | docker login --username AWS --password-stdin ${{env.IMAGE_REGISTRY}}
+#           echo "aws --version"
+#           aws --version
+#           echo "docker info"
+#           docker info
+#           echo "docker --version"
+#           docker --version
+#           echo "docker push ${{env.IMAGE_REGISTRY}}/${{env.APP_NAME}}:${{env.VERSION_GIT_COMMIT}}"
+#           docker push ${{env.IMAGE_REGISTRY}}/${{env.APP_NAME}}:${{env.VERSION_GIT_COMMIT}}
+#           echo "docker push ${{env.IMAGE_REGISTRY}}/${{env.APP_NAME}}:${{env.ENVIRONMENT}}-${GITHUB_ACTION}-${{env.VERSION_GIT_COMMIT}}"
+#           docker push ${{env.IMAGE_REGISTRY}}/${{env.APP_NAME}}:${{env.ENVIRONMENT}}-${GITHUB_ACTION}-${{env.VERSION_GIT_COMMIT}}
+#           echo "docker push ${{env.IMAGE_REGISTRY}}/${{env.APP_NAME}}:${{env.ENVIRONMENT}}-latest"
+#           docker push ${{env.IMAGE_REGISTRY}}/${{env.APP_NAME}}:${{env.ENVIRONMENT}}-latest
 
-  deploy_stagging:
-    if: github.event_name == 'push'
-    runs-on: ubuntu-latest
-    container: alpine/k8s:1.16.15
-    needs: [package_stagging]
-    steps:
-      - name: Configure AWS credentials from Test account
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ap-southeast-1
-      - run: |
-          apk add git
-          mkdir -p $GOPATH/src/$(dirname ${{env.REPO_NAME}})
-          cd $GOPATH/src/$(dirname ${{env.REPO_NAME}})
-          git clone -b master https://${{ secrets.ACCESS_TOKEN }}@github.com/kecci/go-gql-microservice
-          cd $GOPATH/src/${{env.REPO_NAME}}
-          helm repo add go-gql-microservice https://curator:rotaruc@chart.go-gql-microservice.net
-          helm repo update
-          aws eks --region ${{env.AWS_DEFAULT_REGION}} update-kubeconfig --name ${{env.KUBECLUSTER}}
-          kubectl config use-context arn:aws:eks:ap-southeast-1:491248485740:cluster/${{env.KUBECLUSTER}}
-          helm upgrade ${{env.APP_NAME}}-${{env.ENVIRONMENT}} go-gql-microservice/app --install --namespace ${{env.KUBENAMESPACE}} --values _infra/helm/${{env.ENVIRONMENT}}.yaml --set meta.env=${{env.ENVIRONMENT}},meta.maintainer=${{env.KUBENAMESPACE}},meta.version=${{env.ENVIRONMENT}}-${GITHUB_ACTION}-${{env.VERSION_GIT_COMMIT}},image.repository=${IMAGE_REGISTRY}/${{env.APP_NAME}},image.tag=${{env.ENVIRONMENT}}-${GITHUB_ACTION}-${{env.VERSION_GIT_COMMIT}}
+#   deploy_stagging:
+#     if: github.event_name == 'push'
+#     runs-on: ubuntu-latest
+#     container: alpine/k8s:1.16.15
+#     needs: [package_stagging]
+#     steps:
+#       - name: Configure AWS credentials from Test account
+#         uses: aws-actions/configure-aws-credentials@v1
+#         with:
+#           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#           aws-region: ap-southeast-1
+#       - run: |
+#           apk add git
+#           mkdir -p $GOPATH/src/$(dirname ${{env.REPO_NAME}})
+#           cd $GOPATH/src/$(dirname ${{env.REPO_NAME}})
+#           git clone -b master https://${{ secrets.ACCESS_TOKEN }}@github.com/kecci/go-gql-microservice
+#           cd $GOPATH/src/${{env.REPO_NAME}}
+#           helm repo add go-gql-microservice https://curator:rotaruc@chart.go-gql-microservice.net
+#           helm repo update
+#           aws eks --region ${{env.AWS_DEFAULT_REGION}} update-kubeconfig --name ${{env.KUBECLUSTER}}
+#           kubectl config use-context arn:aws:eks:ap-southeast-1:491248485740:cluster/${{env.KUBECLUSTER}}
+#           helm upgrade ${{env.APP_NAME}}-${{env.ENVIRONMENT}} go-gql-microservice/app --install --namespace ${{env.KUBENAMESPACE}} --values _infra/helm/${{env.ENVIRONMENT}}.yaml --set meta.env=${{env.ENVIRONMENT}},meta.maintainer=${{env.KUBENAMESPACE}},meta.version=${{env.ENVIRONMENT}}-${GITHUB_ACTION}-${{env.VERSION_GIT_COMMIT}},image.repository=${IMAGE_REGISTRY}/${{env.APP_NAME}},image.tag=${{env.ENVIRONMENT}}-${GITHUB_ACTION}-${{env.VERSION_GIT_COMMIT}}
