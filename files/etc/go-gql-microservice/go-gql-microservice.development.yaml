@@ -7,9 +7,14 @@ server:
 
 database:
   driver: "postgres"
-  master: "postgres://postgres:postgres123@postgres-kecci:5432/go-gql-microservice?sslmode=disable"
-  follower: "postgres://postgres:postgres123@postgres-kecci:5432/go-gql-microservice?sslmode=disable"
+  master: "postgres://microservice:microservice123@postgres-go-gql-microservice:5432/go-gql-microservice?sslmode=disable"
+  follower: "postgres://microservice:microservice123@postgres-go-gql-microservice:5432/go-gql-microservice?sslmode=disable"
   max_open_conns: 200
   max_idle_conns: 10
   max_retry: 1
   conn_max_lifetime: 300
+
+cache:
+  engine: ""
+  address: "redis-go-gql-microservice:6379"
+  expiry_token: 15

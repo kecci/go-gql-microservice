@@ -9,7 +9,7 @@
 #   APP_NAME: go-gql-microservice
 #   AWS_DEFAULT_REGION: ap-southeast-1
 #   KUBENAMESPACE: backend
-#   KUBECLUSTER: mw-dev
+#   KUBECLUSTER: dev
 
 # on:
 #   pull_request:

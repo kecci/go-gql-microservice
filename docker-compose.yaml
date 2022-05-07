@@ -1,34 +1,62 @@
 version: "3.8"
 services:
-    account-gql:
+    go-gql-microservice:
         build:
             context: .
             dockerfile: development.dockerfile
-        container_name: account-gql
+        container_name: go-gql-microservice
         ports:
             - 8000:8000
         environment: 
             - "APPENV=development"
         volumes:
             - ./:/go/src/github.com/kecci/go-gql-microservice    
+        networks:
+            - local
         depends_on: 
             - postgres
+            - redis
+            - mongo
     postgres:
         image: postgres:12.0-alpine
         environment: 
-            POSTGRES_DB: postgres_db
-            POSTGRES_PASSWORD: postgres123
-            POSTGRES_USER: postgres
+            POSTGRES_DB: go-gql-microservice
+            POSTGRES_USER: microservice
+            POSTGRES_PASSWORD: microservice123
             PGDATA: /var/lib/postgresql/data/go-gql-microservice
-        container_name: postgres-kecci
+        container_name: postgres-go-gql-microservice
         volumes: 
             - .docker/postgres-data:/var/lib/postgresql/data/go-gql-microservice
             - .docker/database_scripts:/docker-entrypoint-initdb.d
             - .docker/seeding/seeds:/seeds
         ports:
             - "5432:5432"
-    # redis:
-    #     container_name: redis-go-gql-microservice
-    #     image: redis:latest
-    #     ports:
-    #         - "6379:6379"
+        networks:
+            - local
+    redis:
+        container_name: redis-microservice
+        image: redis:latest
+        ports:
+            - "6379:6379"
+        volumes:
+            - .docker/cache-data:/var/lib/cache
+            - .docker/cache.conf:/usr/local/etc/cache/cache.conf
+        networks:
+            - local
+    mongo:
+        container_name: mongo-microservice
+        image: mongo
+        environment: 
+        - MONGO_INITDB_DATABASE=mongo_db
+        - MONGO_INITDB_ROOT_USERNAME=mongo
+        - MONGO_INITDB_ROOT_PASSWORD=mongo123
+        ports: 
+        - '27017-27019:27017-27019'
+        volumes:
+            - .docker/mongo-data:/data/db
+        networks:
+            - local
+
+networks:
+    local:
+        driver: bridge

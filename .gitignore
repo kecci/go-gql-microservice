@@ -6,3 +6,6 @@ bin
 .docker/postgres-data
 .docker/nsq-data
 .docker/seeding
+.docker/cache-data
+.docker/cache.conf
+.docker/mongo-data
